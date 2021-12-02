@@ -4,7 +4,7 @@
 ;;
 ;; Author: David Thompson
 ;; Keywords: hypermedia
-;; Package-Requires: ((dtk "0.2"))
+;; Package-Requires: ((dtk "0.2") (ts "0.3-pre")
 ;; Version: 0.1
 ;; URL: https://github.com/dtk01/dtk-daily-light.el
 
@@ -16,13 +16,13 @@
 
 ;;; Code:
 
-;;;;; Internal variables
-(defvar dtk-daily-date
-  '(09 12)				; September 12
-  "Date to use. A list where first member is an integer corresponding
-  to the month and the second member is an integer corresponding to
-  the day.")
+;;;; Requirements
+(require 'ts)
 
+;;;; Internal variables
+(defvar dtk-daily-date
+  nil
+  "Date to use. A TS timestamp.")
 
 ;;;###autoload
 (define-derived-mode dtk-daily-mode dtk-mode "dtk-daily"
@@ -48,23 +48,25 @@
   "Output to DESTINATION. DESTINATION can be a buffer, T (the current
 buffer), NIL (discard output), or 0 (discard and don't wait for
 program to terminate)."
-  (let ((month-day (or dtk-daily-date
-		       (dtk-daily-today))))
-    ;; diatheke -b Daily -o fmnx -k 10.25
-    ;; - for the Daily Light, the key must be of the form MM.DD
-    (dtk-diatheke (format "%02d.%02d" (first month-day) (second month-day))
+  (interactive)
+  (let ((ts-date (or dtk-daily-date
+		     (dtk-daily-today))))
+    ;; For the Daily Light, the key is of the form MM.DD
+    (dtk-diatheke (format "%02d.%02d"
+			  (ts-month ts-date)
+			  (ts-day ts-date))
 		  "Daily"
 		  (or destination t)
 		  :plain
 		  nil)))
 
 (defun dtk-daily-insert (parsed-content)
-  ;; See dtk-daily-parse-handle-match
-  ;; date
-  ;; (insert (propertize (third (first parsed-content))
-  ;; 		      'face 'font-lock-function-name-face)
-  ;; 	  " ")
-  
+  ;; date as cached or default to today
+  (let ((ts-date (or dtk-daily-date (dtk-daily-today))))
+    (insert (ts-month-name ts-date)
+	    " "
+	    (int-to-string (ts-day ts-date))
+	    #xa #xa))
   ;; morning
   (insert (propertize (third (second parsed-content))
 		      'face 'font-lock-variable-name-face)
@@ -81,15 +83,11 @@ program to terminate)."
 
 (defun dtk-daily-set-date-to-today ()
   "Set DTK-DAILY-DATE to today."
-  (destructuring-bind (sec min h day month y dow dst zone)
-      (decode-time (current-time))
-    (setq dtk-daily-date (list month day))))
+  (setq dtk-daily-date (dtk-daily-today)))
 
 (defun dtk-daily-today ()
-  "Return month and day for today."
-  (destructuring-bind (sec min h day month y dow dst zone)
-      (decode-time (current-time))
-    (list month day)))
+  "Return timestamp for today."
+  (ts-now))
 
 ;; Match the first line of raw diatheke output for Daily.
 ;; Expect "MM.DDMM.DD: Morning: < morning text > Evening: < evening text >".
