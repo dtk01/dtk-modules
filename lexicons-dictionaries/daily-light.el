@@ -21,7 +21,7 @@
 
 ;;;; Internal variables
 (defvar dtk-daily-date
-  nil
+  (dtk-daily-today)
   "Date to use. A TS timestamp.")
 
 ;;;###autoload
