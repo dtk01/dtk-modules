@@ -1,6 +1,6 @@
 ;;; dtk-daily-light.el -- read the Daily Light
 ;;
-;; Copyright (C) 2020-2021 David Thompson
+;; Copyright (C) 2020-2022 David Thompson
 ;;
 ;; Author: David Thompson
 ;; Keywords: hypermedia
