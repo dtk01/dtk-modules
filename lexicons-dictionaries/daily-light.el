@@ -161,3 +161,13 @@ program to terminate)."
        (list :text morning-text)
        (list :h 1 "Evening")
        (list :text evening-text)))))
+
+(defun dtk-ts-date= (ts1 ts2)
+  "TS1 and TS2 are ts.el timestamps."
+  (and ts1 ts2
+       (= (ts-day ts1)
+	  (ts-day ts2))
+       (= (ts-month ts1)
+	  (ts-month ts2))
+       (= (ts-year ts1)
+	  (ts-year ts2))))
