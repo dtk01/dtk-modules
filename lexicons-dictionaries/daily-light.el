@@ -21,7 +21,7 @@
 
 ;;;; Internal variables
 (defvar dtk-daily-date
-  (dtk-daily-today)
+  nil
   "Date to use. A TS timestamp.")
 
 ;;;###autoload
@@ -41,16 +41,26 @@
 (defun dtk-daily ()
   "Read the Daily Light entry for today."
   (interactive)
-  (setq dtk-daily-date (dtk-daily-today))
-  (dtk-view-text t t "Daily"))
+  ;; if module isn't correctly set, take care of this now
+  ;; options:
+  ;; 1. set it permanently
+  ;; (dtk-set-module module)
+  ;; 2. set it temporarily
+  (with-dtk-module "Daily"
+    (setq dtk-daily-date (dtk-daily-today))
+    (dtk-view-text t t
+		   "Daily"; old way of setting the module
+		   )))
 
 (defun dtk-daily-retrieve (&optional destination)
   "Output to DESTINATION. DESTINATION can be a buffer, T (the current
 buffer), NIL (discard output), or 0 (discard and don't wait for
 program to terminate)."
   (interactive)
-  (let ((ts-date (or dtk-daily-date
-		     (dtk-daily-today))))
+  (if (not (dtk-ts-date= dtk-daily-date (dtk-daily-today)))
+      (if (y-or-n-p "DTK-DAILY-DATE is not set to the current date. Use current date?")
+	  (setq dtk-daily-date (dtk-daily-today))))
+  (let ((ts-date dtk-daily-date))
     ;; For the Daily Light, the key is of the form MM.DD
     (dtk-diatheke (format "%02d.%02d"
 			  (ts-month ts-date)
@@ -171,3 +181,5 @@ program to terminate)."
 	  (ts-month ts2))
        (= (ts-year ts1)
 	  (ts-year ts2))))
+
+(setf dtk-daily-date (dtk-daily-today))
