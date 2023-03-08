@@ -78,18 +78,18 @@ program to terminate)."
 	    (int-to-string (ts-day ts-date))
 	    #xa #xa))
   ;; morning
-  (insert (propertize (third (second parsed-content))
+  (insert (propertize (cl-third (cl-second parsed-content))
 		      'face 'font-lock-variable-name-face)
 	  #xa)
   ;; morning text
-  (insert (second (third parsed-content))
+  (insert (cl-second (cl-third parsed-content))
 	  #xa #xa)
   ;; evening
-  (insert (propertize (third (fourth parsed-content))
+  (insert (propertize (cl-third (cl-fourth parsed-content))
 		      'face 'font-lock-variable-name-face)
 	  #xa)
   ;; text
-  (insert (second (fifth parsed-content))))
+  (insert (cl-second (cl-fifth parsed-content))))
 
 (defun dtk-daily-set-date-to-today ()
   "Set DTK-DAILY-DATE to today."
