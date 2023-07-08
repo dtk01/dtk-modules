@@ -38,7 +38,7 @@
 	  :mode dtk-daily-mode)))
 
 ;; Convenience wrapper
-(defun dtk-daily ()
+(defun dtk-daily (&optional ts)
   "Read the Daily Light entry for today."
   (interactive)
   ;; if module isn't correctly set, take care of this now
@@ -47,7 +47,7 @@
   ;; (dtk-set-module module)
   ;; 2. set it temporarily
   (with-dtk-module "Daily"
-    (setq dtk-daily-date (dtk-daily-today))
+    (setq dtk-daily-date (or ts (dtk-daily-today)))
     (dtk-view-text t t
 		   "Daily"; old way of setting the module
 		   )))
@@ -58,7 +58,7 @@ buffer), NIL (discard output), or 0 (discard and don't wait for
 program to terminate)."
   (interactive)
   (if (not (dtk-ts-date= dtk-daily-date (dtk-daily-today)))
-      (if (y-or-n-p "DTK-DAILY-DATE is not set to the current date. Use current date?")
+      (if (y-or-n-p "DTK-DAILY-DATE is not set to today's date. Use today's date?")
 	  (setq dtk-daily-date (dtk-daily-today))))
   (let ((ts-date dtk-daily-date))
     ;; For the Daily Light, the key is of the form MM.DD
